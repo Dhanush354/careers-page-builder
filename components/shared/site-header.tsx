@@ -15,7 +15,7 @@ export function SiteHeader() {
               <rect x="9" y="9" width="5" height="5" rx="1" fill="white" opacity="0.3" />
             </svg>
           </div>
-          <span className="text-sm font-bold tracking-tight text-foreground">HireFlow</span>
+          <span className="text-sm font-bold tracking-tight text-foreground">Careers Builder</span>
         </Link>
 
         {/* Nav */}

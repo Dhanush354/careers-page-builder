@@ -67,7 +67,7 @@ const STEPS = [
   {
     number: "01",
     title: "Set up your company",
-    description: "Add your company name, logo, and brand color. HireFlow generates a tailored careers page template instantly.",
+    description: "Add your company name, logo, and brand color. Careers Builder generates a tailored careers page template instantly.",
   },
   {
     number: "02",
@@ -281,7 +281,7 @@ export default function Home() {
                 <p className="mt-2 text-4xl font-bold text-foreground">$29</p>
                 <p className="mt-1 text-sm text-muted-foreground">per month</p>
                 <ul className="mt-8 space-y-3 text-sm text-muted-foreground">
-                  {["Unlimited careers pages", "Unlimited open roles", "Custom domain", "Analytics dashboard", "Priority support", "Remove HireFlow branding"].map((item) => (
+                  {["Unlimited careers pages", "Unlimited open roles", "Custom domain", "Analytics dashboard", "Priority support", "Remove Careers Builder branding"].map((item) => (
                     <li key={item} className="flex items-center gap-2">
                       <svg className="h-4 w-4 text-primary shrink-0" fill="none" viewBox="0 0 16 16" stroke="currentColor" strokeWidth="2"><path d="M3 8l3 3 7-7" strokeLinecap="round" strokeLinejoin="round"/></svg>
                       {item}
@@ -303,7 +303,7 @@ export default function Home() {
               Ready to attract better candidates?
             </h2>
             <p className="mt-4 text-base text-primary-foreground/80">
-              Join recruiters who use HireFlow to build careers pages that convert.
+              Join recruiters who use Careers Builder to build careers pages that convert.
               No design skills, no code, no waiting.
             </p>
             <Button asChild size="lg" className="mt-8 h-12 bg-white px-8 text-base font-semibold text-primary hover:bg-white/90">

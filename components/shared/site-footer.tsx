@@ -34,7 +34,7 @@ export function SiteFooter() {
                   <rect x="9" y="9" width="5" height="5" rx="1" fill="white" opacity="0.3" />
                 </svg>
               </div>
-              <span className="text-sm font-bold text-foreground">HireFlow</span>
+              <span className="text-sm font-bold text-foreground">Careers Builder</span>
             </Link>
             <p className="mt-3 text-xs leading-relaxed text-muted-foreground">
               Build stunning careers pages that attract top talent — no code required.
@@ -60,7 +60,7 @@ export function SiteFooter() {
 
         <div className="mt-12 flex flex-col items-start justify-between gap-4 border-t border-border pt-8 sm:flex-row sm:items-center">
           <p className="text-xs text-muted-foreground">
-            © {new Date().getFullYear()} HireFlow. All rights reserved.
+            © {new Date().getFullYear()} Careers Builder. All rights reserved.
           </p>
           <div className="flex items-center gap-4">
             <Link href="#" className="text-xs text-muted-foreground transition-colors hover:text-foreground">Privacy</Link>
