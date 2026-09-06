@@ -1,6 +1,7 @@
 import { CareersHeader } from "@/components/careers/careers-header";
 import { PageBlockRenderer } from "@/components/careers/page-block-renderer";
 import { getDefaultPageBlocks } from "@/lib/editor/defaults";
+import { getThemeCssVars } from "@/lib/editor/theme-style";
 import type { Company, PageBlockType } from "@/types/company";
 import type { Job } from "@/types/job";
 
@@ -29,7 +30,7 @@ export function CareersPageBody({
   let contentIndex = 0;
 
   return (
-    <div className="flex min-h-full flex-1 flex-col">
+    <div className="flex min-h-full flex-1 flex-col" style={getThemeCssVars(company.theme)}>
       <CareersHeader company={company} />
       <main className="flex-1">
         {pageBlocks.map((block) => {

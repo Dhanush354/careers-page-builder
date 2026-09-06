@@ -88,7 +88,7 @@ export function CareersEditor({
   }, [theme, pageBlocks]);
 
   return (
-    <div className="flex h-screen w-full bg-[--shell-canvas]">
+    <div className="flex h-screen w-full flex-col bg-[--shell-canvas] lg:flex-row">
       <AppSidebar
         companySlug={company.slug}
         isPublished={company.published_at !== null}

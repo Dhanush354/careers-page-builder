@@ -9,6 +9,7 @@ export type GjsActionResult = { ok: true } | { ok: false; error: string };
 function revalidateBuilderRoutes(slug: string) {
   revalidatePath(`/${slug}/builder`);
   revalidatePath(`/${slug}/careers`);
+  revalidatePath(`/${slug}/career`);
 }
 
 export async function saveGrapejsData(
@@ -45,7 +46,7 @@ export async function publishGrapejsPage(
   }
 
   // editor.getHtml() returns body content only — wrap it into a complete document
-  // so /[slug]/live can serve it directly as a styled standalone page.
+  // so /[slug]/career can serve it directly as a styled standalone page.
   const fullHtml = `<!DOCTYPE html>
 <html lang="en">
 <head>

@@ -7,6 +7,16 @@ export type CompanyTheme = {
   secondaryColor?: string;
   logoUrl?: string | null;
   bannerUrl?: string | null;
+  // Typography — id of a FONT_OPTIONS entry (lib/editor/theme-options.ts)
+  fontFamily?: string;
+  // Base reading-text size preference
+  fontSize?: "sm" | "md" | "lg";
+  // Overrides the default heading/body text color across the page
+  textColor?: string;
+  // id of the last-applied STYLE_PRESETS entry (lib/editor/style-presets.ts),
+  // purely so the editor can highlight which preset is active — never read
+  // when rendering the page itself
+  presetId?: string;
 };
 
 export type StatItem = {

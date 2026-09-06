@@ -3,6 +3,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import {
+  Eye,
+  EyeOff,
   Globe,
   Loader2,
   Monitor,
@@ -175,23 +177,24 @@ export default function GrapejsCanvas({ company, jobs }: Props) {
 
   const handleUndo        = useCallback(() => editorRef.current?.runCommand("core:undo"),  []);
   const handleRedo        = useCallback(() => editorRef.current?.runCommand("core:redo"),  []);
+  const handleEnterPreview = useCallback(() => { editorRef.current?.runCommand("core:preview"); setIsPreviewing(true); }, []);
   const handleExitPreview = useCallback(() => { editorRef.current?.stopCommand("core:preview"); setIsPreviewing(false); }, []);
 
   // ── Render ───────────────────────────────────────────────────────────────
   return (
-    <div className="flex h-screen w-full bg-background">
+    <div className="flex h-screen w-full flex-col bg-background lg:flex-row">
       <AppSidebar companySlug={company.slug} isPublished={company.published_at !== null} />
 
       <div className="flex flex-1 flex-col overflow-hidden">
 
         {/* ── Toolbar ─────────────────────────────────────────────────────── */}
         <header className={cn(
-          "flex shrink-0 items-center gap-3 border-b border-border px-4 py-2",
+          "flex shrink-0 flex-wrap items-center justify-between gap-2 border-b border-border px-4 py-2",
           isPreviewing ? "bg-gray-900" : "bg-background"
         )}>
 
           {/* Brand + title */}
-          <div className="min-w-0 flex-1">
+          <div className="min-w-0">
             <Link href="/dashboard" className={cn("text-xs transition-colors", isPreviewing ? "text-gray-400 hover:text-white" : "text-muted-foreground hover:text-foreground")}>
               ← Dashboard
             </Link>
@@ -201,109 +204,119 @@ export default function GrapejsCanvas({ company, jobs }: Props) {
             </p>
           </div>
 
-          {/* ── Exit Preview button (only in preview mode) ───────────────── */}
-          {isPreviewing && (
-            <Button size="sm" onClick={handleExitPreview} className="bg-white text-gray-900 hover:bg-gray-100 border-0 font-semibold">
-              ✕ Exit Preview
-            </Button>
-          )}
+          <div className="flex flex-wrap items-center gap-2">
+            {/* ── Preview / Exit Preview toggle ───────────────────────────── */}
+            {isPreviewing ? (
+              <Button size="sm" onClick={handleExitPreview} className="bg-white text-gray-900 hover:bg-gray-100 border-0 font-semibold">
+                <EyeOff className="mr-1.5 h-3.5 w-3.5" />
+                Exit Preview
+              </Button>
+            ) : (
+              <Button variant="outline" size="sm" onClick={handleEnterPreview} disabled={!ready}>
+                <Eye className="mr-1.5 h-3.5 w-3.5" />
+                Preview
+              </Button>
+            )}
 
-          {/* ── Device toggle tabs ──────────────────────────────────────── */}
-          <div className="flex items-center gap-0.5 rounded-lg border border-border bg-muted/40 p-1">
-            {DEVICES.map((d) => (
+            {/* ── Device toggle tabs — desktop-only; meaningless when you're
+                already viewing this on the device it simulates ──────────── */}
+            <div className="hidden items-center gap-0.5 rounded-lg border border-border bg-muted/40 p-1 lg:flex">
+              {DEVICES.map((d) => (
+                <button
+                  key={d.name}
+                  type="button"
+                  title={d.label}
+                  aria-pressed={activeDevice === d.name}
+                  onClick={() => handleDevice(d)}
+                  disabled={!ready}
+                  className={cn(
+                    "flex flex-col items-center gap-0.5 rounded-md px-2.5 py-1 transition-all duration-150 disabled:opacity-40",
+                    activeDevice === d.name
+                      ? "bg-background text-foreground shadow-sm"
+                      : "text-muted-foreground hover:text-foreground"
+                  )}
+                >
+                  {d.icon}
+                  <span className="text-[9px] font-semibold leading-none">{d.label}</span>
+                </button>
+              ))}
+            </div>
+
+            {/* ── Undo / Redo ───────────────────────────────────────────── */}
+            <div className="flex items-center gap-0.5 rounded-lg border border-border bg-muted/40 p-1">
               <button
-                key={d.name}
                 type="button"
-                title={d.label}
-                aria-pressed={activeDevice === d.name}
-                onClick={() => handleDevice(d)}
+                title="Undo (Ctrl+Z)"
+                onClick={handleUndo}
                 disabled={!ready}
-                className={cn(
-                  "flex flex-col items-center gap-0.5 rounded-md px-2.5 py-1 transition-all duration-150 disabled:opacity-40",
-                  activeDevice === d.name
-                    ? "bg-background text-foreground shadow-sm"
-                    : "text-muted-foreground hover:text-foreground"
-                )}
+                className="flex items-center justify-center rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-background hover:text-foreground disabled:opacity-40"
               >
-                {d.icon}
-                <span className="text-[9px] font-semibold leading-none">{d.label}</span>
+                <Undo2 className="h-3.5 w-3.5" />
               </button>
-            ))}
-          </div>
+              <button
+                type="button"
+                title="Redo (Ctrl+Y)"
+                onClick={handleRedo}
+                disabled={!ready}
+                className="flex items-center justify-center rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-background hover:text-foreground disabled:opacity-40"
+              >
+                <Redo2 className="h-3.5 w-3.5" />
+              </button>
+            </div>
 
-          {/* ── Undo / Redo ─────────────────────────────────────────────── */}
-          <div className="flex items-center gap-0.5 rounded-lg border border-border bg-muted/40 p-1">
-            <button
-              type="button"
-              title="Undo (Ctrl+Z)"
-              onClick={handleUndo}
-              disabled={!ready}
-              className="flex items-center justify-center rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-background hover:text-foreground disabled:opacity-40"
-            >
-              <Undo2 className="h-3.5 w-3.5" />
-            </button>
-            <button
-              type="button"
-              title="Redo (Ctrl+Y)"
-              onClick={handleRedo}
-              disabled={!ready}
-              className="flex items-center justify-center rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-background hover:text-foreground disabled:opacity-40"
-            >
-              <Redo2 className="h-3.5 w-3.5" />
-            </button>
-          </div>
-
-          {/* ── Auto-save pill ──────────────────────────────────────────── */}
-          <span className="hidden items-center gap-1 rounded-full border border-border bg-muted/50 px-2 py-0.5 text-[10px] font-medium text-muted-foreground sm:flex">
-            <span className={cn(
-              "inline-block h-1.5 w-1.5 rounded-full",
-              saveStatus === "saving" ? "animate-pulse bg-amber-400" : "bg-emerald-400"
-            )} />
-            {saveStatus === "saving" ? "Saving…" : "Auto-save on"}
-          </span>
-
-          {/* ── Loading ─────────────────────────────────────────────────── */}
-          {!ready && (
-            <span className="flex items-center gap-1 text-xs text-muted-foreground">
-              <Loader2 className="h-3 w-3 animate-spin" />
-              Loading…
+            {/* ── Auto-save pill ────────────────────────────────────────── */}
+            <span className="hidden items-center gap-1 rounded-full border border-border bg-muted/50 px-2 py-0.5 text-[10px] font-medium text-muted-foreground sm:flex">
+              <span className={cn(
+                "inline-block h-1.5 w-1.5 rounded-full",
+                saveStatus === "saving" ? "animate-pulse bg-amber-400" : "bg-emerald-400"
+              )} />
+              {saveStatus === "saving" ? "Saving…" : "Auto-save on"}
             </span>
-          )}
 
-          {/* ── Save / Publish ──────────────────────────────────────────── */}
-          <Button variant="outline" size="sm" onClick={handleSave} disabled={!ready || saveStatus === "saving"}>
-            <Save className="mr-1.5 h-3.5 w-3.5" />
-            {saveStatus === "saving" ? "Saving…" : saveStatus === "saved" ? "Saved ✓" : "Save Draft"}
-          </Button>
+            {/* ── Loading ───────────────────────────────────────────────── */}
+            {!ready && (
+              <span className="flex items-center gap-1 text-xs text-muted-foreground">
+                <Loader2 className="h-3 w-3 animate-spin" />
+                Loading…
+              </span>
+            )}
 
-          <Button size="sm" onClick={handlePublish} disabled={!ready || pubStatus === "publishing"}>
-            <Globe className="mr-1.5 h-3.5 w-3.5" />
-            {pubStatus === "publishing" ? "Publishing…" : pubStatus === "published" ? "Published ✓" : "Publish"}
-          </Button>
-
-          {company.published_at && (
-            <Button variant="ghost" size="sm" asChild>
-              <Link href={`/${company.slug}/live`} target="_blank" rel="noopener noreferrer">
-                View Live ↗
-              </Link>
+            {/* ── Save / Publish ────────────────────────────────────────── */}
+            <Button variant="outline" size="sm" onClick={handleSave} disabled={!ready || saveStatus === "saving"}>
+              <Save className="mr-1.5 h-3.5 w-3.5" />
+              {saveStatus === "saving" ? "Saving…" : saveStatus === "saved" ? "Saved ✓" : "Save Draft"}
             </Button>
-          )}
+
+            <Button size="sm" onClick={handlePublish} disabled={!ready || pubStatus === "publishing"}>
+              <Globe className="mr-1.5 h-3.5 w-3.5" />
+              {pubStatus === "publishing" ? "Publishing…" : pubStatus === "published" ? "Published ✓" : "Publish"}
+            </Button>
+
+            {company.published_at && (
+              <Button variant="ghost" size="sm" asChild>
+                <Link href={`/${company.slug}/career`} target="_blank" rel="noopener noreferrer">
+                  View Live ↗
+                </Link>
+              </Button>
+            )}
+          </div>
         </header>
 
         {/* ── GrapeJS canvas ──────────────────────────────────────────────── */}
-        <div className="relative flex-1 overflow-hidden" style={{ height: "calc(100vh - 56px)" }}>
+        {/* flex-1 alone sizes this correctly regardless of how tall the
+            header above renders — it can wrap to two rows on narrow
+            screens now that the toolbar uses flex-wrap. */}
+        <div className="relative min-h-0 flex-1 overflow-hidden">
           <div ref={containerRef} className="h-full w-full" />
 
           {/* Floating Exit Preview button — only visible in preview mode */}
           {isPreviewing && (
             <button
               type="button"
-              onClick={() => editorRef.current?.stopCommand("core:preview")}
+              onClick={handleExitPreview}
               className="absolute bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 rounded-full bg-gray-900/90 px-5 py-2.5 text-sm font-semibold text-white shadow-xl backdrop-blur-sm hover:bg-gray-900 transition-colors"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
-              </svg>
+              <EyeOff className="h-4 w-4" />
               Exit Preview
             </button>
           )}

@@ -23,7 +23,7 @@ export default async function JobsPage() {
   }
 
   return (
-    <div className="flex min-h-screen w-full bg-[--shell-canvas]">
+    <div className="flex min-h-screen w-full flex-col bg-[--shell-canvas] lg:flex-row">
       <AppSidebar
         companySlug={company.slug}
         isPublished={isPublished}

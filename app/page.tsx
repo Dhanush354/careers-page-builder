@@ -127,7 +127,7 @@ export default function Home() {
                 <Link href="/login">Start building for free</Link>
               </Button>
               <Button asChild size="lg" variant="outline" className="h-12 px-8 text-base">
-                <Link href="/google/live" target="_blank" rel="noopener noreferrer">
+                <Link href="/google/career" target="_blank" rel="noopener noreferrer">
                   See live example ↗
                 </Link>
               </Button>
@@ -172,7 +172,7 @@ export default function Home() {
         {/* ── Stats bar ────────────────────────────────────────────────────── */}
         <section className="border-y border-border bg-muted/30">
           <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6 lg:px-8">
-            <div className="grid grid-cols-3 gap-8 text-center">
+            <div className="grid grid-cols-1 gap-8 text-center sm:grid-cols-3">
               {STATS.map((s) => (
                 <div key={s.label}>
                   <p className="text-3xl font-bold text-foreground sm:text-4xl">{s.value}</p>

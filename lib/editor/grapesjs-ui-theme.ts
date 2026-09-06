@@ -425,6 +425,10 @@ export function buildGjsUITheme(primaryColor: string): string {
 /* ── Hide GrapeJS's built-in device panel (we render our own tabs) ───────── */
 .gjs-devices-c { display: none !important; }
 
+/* ── Hide GrapeJS's built-in preview toggle (tiny fa-eye icon) — we render
+   our own larger, clearly labeled Preview / Exit Preview buttons instead ─── */
+.gjs-pn-btn[title="Preview"] { display: none !important; }
+
 /* ── Block thumbnail improvements ───────────────────────────────────────── */
 .gjs-block {
   width: calc(50% - 4px) !important;

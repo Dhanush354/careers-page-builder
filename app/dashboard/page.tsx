@@ -97,7 +97,7 @@ export default async function DashboardPage() {
   ];
 
   return (
-    <div className="flex min-h-screen w-full bg-[--shell-canvas]">
+    <div className="flex min-h-screen w-full flex-col bg-[--shell-canvas] lg:flex-row">
       <AppSidebar
         companySlug={company.slug}
         isPublished={isPublished}
@@ -192,9 +192,11 @@ export default async function DashboardPage() {
             <div className="mt-5 grid grid-cols-1 gap-5 md:grid-cols-5">
               <div className="md:col-span-3">
                 <LivePageSnapshot
+                  companySlug={company.slug}
                   theme={company.theme}
                   pageBlocks={company.page_blocks}
                   companyName={company.name}
+                  publicationStatus={publicationStatus}
                 />
               </div>
               <div className="md:col-span-2">

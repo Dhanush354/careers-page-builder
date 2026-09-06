@@ -259,7 +259,7 @@ export function ResponsivePreview({
 
       <div className="flex flex-1 flex-col items-center overflow-auto bg-muted/40 px-4 py-6 sm:px-6 lg:px-8">
         <div
-          className="h-[min(850px,calc(100vh-260px))] overflow-hidden rounded-xl border border-border bg-background shadow-sm"
+          className="h-[min(850px,calc(100vh-260px))] overflow-hidden rounded-xl border border-border bg-background shadow-sm lg:h-full"
           style={frameStyle}
         >
           <iframe

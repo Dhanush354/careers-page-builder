@@ -141,8 +141,8 @@ function JobsTable({
   jobs: Job[]; onEdit(j: Job): void; onToggle(j: Job): void; onDelete(j: Job): void;
 }) {
   return (
-    <div className="zk-card overflow-hidden">
-      <table className="w-full text-sm">
+    <div className="zk-card overflow-x-auto">
+      <table className="w-full min-w-[720px] text-sm">
         <thead>
           <tr className="border-b border-black/[0.05] dark:border-white/[0.05]">
             {["Role", "Department", "Location", "Type", "Policy", "Status", ""].map((h) => (
@@ -330,7 +330,7 @@ export function JobsManager({ jobs: initialJobs }: { jobs: Job[] }) {
   return (
     <>
       {/* Page header */}
-      <div className="mb-6 flex items-start justify-between gap-4">
+      <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
         <div>
           <p className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground/50">Jobs</p>
           <h1 className="mt-1 text-2xl font-bold tracking-tight text-foreground">Job Postings</h1>
@@ -350,9 +350,9 @@ export function JobsManager({ jobs: initialJobs }: { jobs: Job[] }) {
       {optimisticJobs.length === 0 ? (
         <EmptyState onAdd={openAdd} onSeed={handleSeed} />
       ) : (
-        <div className="flex gap-5">
+        <div className="flex flex-col gap-5 lg:flex-row">
           {/* ── Left panel ─────────────────────────────────────── */}
-          <aside className="w-52 shrink-0">
+          <aside className="lg:w-52 lg:shrink-0">
             <div className="rounded-xl bg-foreground p-4 text-background">
               <p className="text-[13px] font-bold">
                 {optimisticJobs.length} Open Role{optimisticJobs.length !== 1 ? "s" : ""}
@@ -412,14 +412,14 @@ export function JobsManager({ jobs: initialJobs }: { jobs: Job[] }) {
 
           {/* ── Right panel ────────────────────────────────────── */}
           <div className="min-w-0 flex-1">
-            <div className="mb-4 flex items-center justify-between">
+            <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
               <div className="flex items-center gap-2">
                 <h2 className="text-base font-bold text-foreground">{selectedDept ?? "All Roles"}</h2>
                 <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-primary/10 px-1.5 text-[11px] font-bold text-primary">
                   {filtered.length}
                 </span>
               </div>
-              <div className="flex items-center gap-3">
+              <div className="flex flex-wrap items-center gap-3">
                 <span className="text-[11px] text-muted-foreground">
                   {activeCount} active · {filtered.length - activeCount} inactive
                 </span>

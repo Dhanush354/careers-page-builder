@@ -1,5 +1,6 @@
-import Image from "next/image";
-import { CheckCircle2, Image as ImageIcon, LayoutTemplate, XCircle } from "lucide-react";
+import { CheckCircle2, LayoutTemplate, XCircle } from "lucide-react";
+import { PublicationStatusBadge } from "@/components/editor/publication-status-badge";
+import type { PublicationStatus } from "@/lib/editor/publication-status";
 import type { CompanyTheme, PageBlock } from "@/types/company";
 
 function StatusRow({
@@ -26,13 +27,17 @@ function StatusRow({
 }
 
 export function LivePageSnapshot({
+  companySlug,
   theme,
   pageBlocks,
   companyName,
+  publicationStatus,
 }: {
+  companySlug: string;
   theme: CompanyTheme;
   pageBlocks: PageBlock[];
   companyName: string;
+  publicationStatus: PublicationStatus;
 }) {
   const accentColor = theme.primaryColor ?? "#4F46E5";
   const visibleSections = pageBlocks.filter((b) => b.visible).length;
@@ -44,46 +49,26 @@ export function LivePageSnapshot({
           <LayoutTemplate className="h-4 w-4 text-muted-foreground" />
           <span className="text-sm font-semibold text-foreground">Live Page Snapshot</span>
         </div>
-        <span className="rounded-full bg-muted px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-          Draft
-        </span>
+        <PublicationStatusBadge status={publicationStatus} />
       </div>
 
-      {/* Mini page preview */}
-      <div className="mx-4 my-4 overflow-hidden rounded-lg" style={{ boxShadow: "0 0 0 1px rgb(0 0 0 / 0.07)" }}>
-        {/* Accent banner */}
-        <div
-          className="flex h-10 items-center gap-2 px-3"
-          style={{ backgroundColor: accentColor }}
-        >
-          {theme.logoUrl ? (
-            <Image
-              src={theme.logoUrl}
-              alt={companyName}
-              width={24}
-              height={24}
-              className="h-6 w-6 rounded object-contain"
-            />
-          ) : (
-            <div className="flex h-6 w-6 items-center justify-center rounded bg-white/20">
-              <ImageIcon className="h-3.5 w-3.5 text-white/70" />
-            </div>
-          )}
-          <span className="text-[11px] font-semibold text-white/90">{companyName}</span>
-        </div>
-
-        {/* Body preview — gray strips mimicking content */}
-        <div className="bg-muted/20 px-3 py-3 space-y-2">
-          <div className="h-2 w-3/4 rounded-full bg-muted-foreground/20" />
-          <div className="h-2 w-1/2 rounded-full bg-muted-foreground/10" />
-          <div className="mt-3 flex gap-2">
-            <div
-              className="h-6 w-20 rounded"
-              style={{ backgroundColor: accentColor, opacity: 0.85 }}
-            />
-            <div className="h-6 w-16 rounded bg-muted-foreground/10" />
-          </div>
-        </div>
+      {/* Real thumbnail of the recruiter's actual current page — reuses the
+          same authenticated /preview/frame route the full preview page uses
+          (draft content, not just published), scaled down via CSS transform
+          rather than a mocked/placeholder rendering. */}
+      <div
+        className="relative mx-4 my-4 aspect-[16/10] overflow-hidden rounded-lg bg-background"
+        style={{ boxShadow: "0 0 0 1px rgb(0 0 0 / 0.07)" }}
+      >
+        <iframe
+          src={`/${companySlug}/preview/frame`}
+          title={`${companyName} live page snapshot`}
+          loading="lazy"
+          tabIndex={-1}
+          aria-hidden="true"
+          className="pointer-events-none absolute left-0 top-0 origin-top-left border-0"
+          style={{ width: "400%", height: "400%", transform: "scale(0.25)" }}
+        />
       </div>
 
       {/* Status grid */}

@@ -3,6 +3,7 @@
 import { CareersHeader } from "@/components/careers/careers-header";
 import { PageBlockRenderer } from "@/components/careers/page-block-renderer";
 import { EditorContext } from "@/contexts/editor-context";
+import { getThemeCssVars } from "@/lib/editor/theme-style";
 import type { Company, CompanyTheme, PageBlock } from "@/types/company";
 import type { Job } from "@/types/job";
 
@@ -29,7 +30,10 @@ export function EditorPreview({
         onBlockChange: onBlockChange ?? (() => {}),
       }}
     >
-      <div className="flex min-h-full flex-col overflow-hidden rounded-xl border border-border bg-background shadow-sm">
+      <div
+        className="flex min-h-full flex-col overflow-hidden rounded-xl border border-border bg-background shadow-sm"
+        style={getThemeCssVars(theme)}
+      >
         <CareersHeader company={previewCompany} />
         {pageBlocks.map((block) => (
           <PageBlockRenderer

@@ -1,15 +1,22 @@
 import { z } from "zod";
+import { FONT_OPTIONS } from "@/lib/editor/theme-options";
 
 const HEX_COLOR_PATTERN = /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/;
 const hexColor = z
   .string()
   .regex(HEX_COLOR_PATTERN, "Enter a valid hex color, e.g. #2563eb.");
 
+const FONT_IDS = FONT_OPTIONS.map((f) => f.id) as [string, ...string[]];
+
 export const themeSchema = z.object({
   primaryColor: hexColor.optional(),
   secondaryColor: hexColor.optional(),
   logoUrl: z.string().nullable().optional(),
   bannerUrl: z.string().nullable().optional(),
+  fontFamily: z.enum(FONT_IDS).optional(),
+  fontSize: z.enum(["sm", "md", "lg"]).optional(),
+  textColor: hexColor.optional(),
+  presetId: z.string().max(60).optional(),
 });
 
 const heroContentSchema = z.object({

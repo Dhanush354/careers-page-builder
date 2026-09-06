@@ -40,6 +40,12 @@ export async function GET(
     }
   }
 
+  // GrapeJS exports fixed pixel/column layouts with no media queries at all
+  // (verified: zero @media rules in published output). Applied at serve
+  // time so it fixes every already-published page immediately too, not
+  // just pages published after this change.
+  finalHtml = injectMobileStyles(finalHtml);
+
   return new NextResponse(finalHtml, {
     headers: {
       "Content-Type": "text/html; charset=utf-8",
@@ -93,9 +99,33 @@ function injectJobs(html: string, jobs: Job[], primary: string): string {
       <h2 style="font-size:2.25rem;font-weight:700;color:#111827;">Open Roles</h2>
       <p style="font-size:1rem;color:#6B7280;margin-top:8px;">${jobs.length} position${jobs.length !== 1 ? "s" : ""} available</p>
     </div>
-    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:16px;">${cards}</div>`;
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;">${cards}</div>`;
 
   return replaceOpenRolesContent(html, section);
+}
+
+// GrapeJS's export has no responsive behavior at all — every block is
+// authored as fixed pixel/column CSS with zero @media rules. This is a
+// serve-time safety net rather than a per-block rewrite, so it applies to
+// every already-published page immediately, not just future ones.
+function injectMobileStyles(html: string): string {
+  const style = `
+    <style>
+      html, body { overflow-x: hidden; }
+      @media (max-width: 700px) {
+        /* Collapse any multi-column grid GrapeJS exported (stats, benefits,
+           hero image/text split, testimonials, job cards, ...) to one column. */
+        * { grid-template-columns: 1fr !important; }
+        h1 { font-size: clamp(1.75rem, 8vw, 2.25rem) !important; line-height: 1.15 !important; }
+        h2 { font-size: clamp(1.5rem, 7vw, 2rem) !important; line-height: 1.2 !important; }
+        h3 { font-size: clamp(1.25rem, 6vw, 1.5rem) !important; line-height: 1.25 !important; }
+        section { padding-top: 48px !important; padding-bottom: 48px !important; }
+      }
+    </style>`;
+
+  return html.includes("</head>")
+    ? html.replace("</head>", `${style}\n</head>`)
+    : style + html;
 }
 
 // Replaces everything inside the [data-inject="open-roles"] element's inner div
