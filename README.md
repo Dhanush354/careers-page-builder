@@ -11,6 +11,80 @@ Published career pages automatically display the company's active job openings.
 
 ---
 
+# How to Run
+
+## Prerequisites
+
+- Node.js 20 or later
+- A Supabase project (the free tier is enough)
+- A Cloudinary account with an **unsigned** upload preset
+
+## 1. Install dependencies
+
+```bash
+npm install
+```
+
+## 2. Set up environment variables
+
+Copy `.env.example` to `.env.local` and fill in the values:
+
+```
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=
+SUPABASE_SECRET_KEY=
+NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=
+NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET=
+```
+
+- `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` come from your Supabase project's API settings.
+- `SUPABASE_SECRET_KEY` is the service role key. It is server-only and must never be exposed to the browser. It is used for signup (creating the first company + profile) and for job management.
+- `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME` and `NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET` come from your Cloudinary dashboard. The upload preset must have its signing mode set to **Unsigned**.
+
+## 3. Set up the database
+
+Run each migration file against your Supabase project, in order, using the Supabase SQL Editor (or `supabase db push` if the CLI is linked):
+
+```
+supabase/migrations/001_initial_schema.sql
+supabase/migrations/002_published_snapshots.sql
+supabase/migrations/003_grapesjs_canvas.sql
+```
+
+Then check the connection:
+
+```bash
+npm run check:supabase
+```
+
+## 4. (Optional) Seed sample jobs
+
+`data/jobs.csv` contains sample job listings. To load them into a company's job list:
+
+```bash
+npm run seed:jobs
+```
+
+This script uses the service role key directly and is meant for local/admin use only.
+
+## 5. Start the app
+
+```bash
+npm run dev
+```
+
+Open [http://localhost:3000](http://localhost:3000).
+
+Other available scripts:
+
+```bash
+npm run build   # production build
+npm run start   # run the production build
+npm run lint    # run eslint
+```
+
+---
+
 # What I Built
 
 The main goal of Career Builder is to make it easy for companies and recruiters to create their own careers page without building a separate website from scratch.
@@ -142,3 +216,55 @@ A special marker is used inside the canvas:
 
 ```html
 data-inject="open-roles"
+```
+
+When a canvas page is published, this marker is left in the page's HTML. When the page is served publicly, the server looks for that marker and replaces its contents with real, live job cards pulled from the company's active jobs — not a snapshot taken at publish time. This means:
+
+- A job posted or closed after publishing shows up immediately, without republishing the canvas.
+- If there are no active jobs, a friendly "No open roles right now" empty state is shown instead of an empty section.
+
+---
+
+### 7. Mobile-Responsive Public Pages
+
+GrapesJS exports fixed pixel-based layouts with no responsive behavior built in. To fix this, published canvas pages get a small responsive stylesheet added automatically when they're served — collapsing multi-column layouts and scaling down headings on narrow screens. This applies to every published page, including ones published before this fix was added.
+
+---
+
+### 8. Publish / Unpublish Workflow
+
+Both editors follow the same safe publish pattern:
+
+- Saving only updates the draft. The public page never changes until you explicitly publish.
+- Publishing re-checks the current saved draft on the server and copies it into a separate "published" snapshot — the public page always renders from that snapshot, never directly from whatever is currently being edited.
+- Unpublishing simply takes the page offline. Nothing is deleted, so republishing later restores it exactly as it was.
+
+---
+
+# Step-by-Step User Guide
+
+1. **Sign up.** Go to `/signup` and enter your name, your company name, a company URL slug (for example `acme`, which becomes `/acme/careers`), your email, and a password (8+ characters).
+2. **Log in.** If your Supabase project requires email confirmation, confirm your email first, then log in at `/login`. You'll land on `/dashboard`.
+3. **Customize your branding.** From the dashboard, open "Customize Branding & Theme" to go to the structured editor. Upload a logo and banner, set your primary/secondary colors, pick a font, and optionally apply a style preset for a quick starting look.
+4. **Build your page.** Still in the editor, add, remove, reorder, and toggle the visibility of sections (About, Benefits, Stats, Testimonials, FAQ, etc.), and edit their text directly.
+5. **Or use the visual canvas instead.** If you'd rather design freely, go to `/<your-slug>/builder` and drag blocks directly onto the canvas.
+6. **Save your work.** Click Save at any time — this updates your draft only, the public page is unaffected. Use Preview to see exactly what it will look like once published.
+7. **Publish.** When you're happy with it, click Publish. Your page goes live at `/<your-slug>/careers` (structured editor) or `/<your-slug>/career` (canvas builder). Copy the public link from the dashboard's "Public Careers Page" card.
+8. **Add your open roles.** Go to `/jobs` and create job postings — title, department, location, employment type, experience level, and salary range. Deactivate or delete a job to remove it from the public page instantly, with no need to touch or republish the page itself.
+9. **Unpublish if needed.** If you want to take your page offline temporarily, unpublish it from the editor. Your draft stays intact and you can republish later without losing anything.
+
+---
+
+# Improvement Plan
+
+Things I'd tackle next, roughly in priority order:
+
+- **Route protection at the middleware level.** Right now every protected page checks the recruiter's session itself; a shared middleware-level check would make it harder to accidentally ship a new page without that guard.
+- **Reconcile the two editors.** A company can currently publish through the structured editor and the canvas builder independently, which can leave `/<slug>/careers` and `/<slug>/career` out of sync with each other. I'd like to either lock a company to one builder once chosen, or make the dashboard clearly show which one is actually live.
+- **Signed image uploads.** Move from an unsigned Cloudinary preset to signed uploads (or Supabase Storage with a scoped policy) so the upload endpoint can't be used by anyone who finds the cloud name and preset.
+- **Support more than one recruiter per company.** Right now a recruiter profile links to exactly one company. Adding a proper membership table would allow teams to share a workspace with roles (owner/editor).
+- **Real billing.** The pricing tiers on the landing page are currently just marketing copy — connecting them to an actual payment provider and gating Pro features (custom domain, analytics, branding removal) is a natural next step.
+- **Automated tests.** There's currently no automated test suite. I'd start with tests around the authorization checks and the publish/unpublish logic, since those are the parts most important to get right.
+- **Analytics.** Basic page-view and apply-click tracking per company, to back up the "Analytics dashboard" mentioned in the Pro tier.
+- **Custom domains.** Let a company serve its careers page from its own domain instead of only under `/<slug>/careers`.
+- **A real application flow.** The "Apply" button on job listings is currently a placeholder. Adding an actual application form, or letting a recruiter link out to their existing ATS, would make the page functional end-to-end.
