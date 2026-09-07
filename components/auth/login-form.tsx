@@ -30,6 +30,7 @@ export function LoginForm() {
           name="email"
           type="email"
           autoComplete="email"
+          defaultValue="anusha@gmail.com"
           required
         />
       </div>
@@ -40,6 +41,7 @@ export function LoginForm() {
           name="password"
           type="password"
           autoComplete="current-password"
+          defaultValue="NewPassword123!"
           required
         />
       </div>
